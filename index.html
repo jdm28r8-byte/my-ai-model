@@ -1,9 +1,8 @@
-HTML
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>비키니시티 포즈 측정소 </title>
+    <title>비키니시티 포즈 측정소</title>
     <style>
         /* 비키니시티 바닷속 테마 배경 */
         body {
@@ -141,7 +140,7 @@ HTML
             display: block;
         }
 
-        /* 말풍선 기본 공통 스타일 */
+        /* 말풍선 공통 스타일 */
         .bubble {
             position: absolute;
             background: #ffffff;
@@ -161,7 +160,6 @@ HTML
             pointer-events: none;
         }
 
-        /* 말풍선 꼬리표 디자인 */
         .bubble::after {
             content: '';
             position: absolute;
@@ -170,7 +168,6 @@ HTML
             width: 0;
         }
 
-        /* 스폰지밥 말풍선 위치 */
         #spongebob-bubble {
             top: -70px;
             left: 150px;
@@ -193,7 +190,6 @@ HTML
             width: 0;
         }
 
-        /* 뚱이 말풍선 위치 */
         #patrick-bubble {
             top: -70px;
             right: 100px;
@@ -216,12 +212,10 @@ HTML
             width: 0;
         }
 
-        /* 말풍선 활성화 */
         .bubble.show {
             opacity: 1;
         }
 
-        /* 둥실둥실 애니메이션 */
         @keyframes floatSpongebob {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-25px) rotate(3deg); }
@@ -253,8 +247,8 @@ HTML
         <img class="character-img" src="./뚱이.png" alt="뚱이">
     </div>
 
-    <h1>Bikini Bottom Pose Center</h1>
-    <button type="button" onclick="init()">출근하기! (시작)</button>
+    <h1>비키니시티 포즈 측정소</h1>
+    <button type="button" onclick="init()">출근하기!(시작)</button>
     
     <div id="canvas-container">
         <canvas id="canvas"></canvas>
@@ -289,7 +283,6 @@ HTML
             }
         };
 
-        // 스폰지밥 대사 목록
         const spongebobQuotes = [
             "월요일 좋아~ 최고로 좋아~!",
             "오늘도 좋은 하루야, 친구!",
@@ -299,7 +292,6 @@ HTML
             "징징아! 같이 해파리 잡으러 가자!"
         ];
 
-        // 뚱이 대사 목록 (요청하신 내용으로 업데이트 완료!)
         const patrickQuotes = [
             "아뇨, 뚱인데요?",
             "지식은 우정을 대신할 수 없어.",
@@ -309,6 +301,9 @@ HTML
             "다리가 저릴 땐 누워있는 게 최고야."
         ];
 
+        let lastSpongeIndex = -1;
+        let lastPatrickIndex = -1;
+
         function startTalking() {
             const spongebobBubble = document.getElementById("spongebob-bubble");
             const patrickBubble = document.getElementById("patrick-bubble");
@@ -317,8 +312,20 @@ HTML
             patrickBubble.classList.add("show");
 
             setInterval(() => {
-                const randomSponge = spongebobQuotes[Math.floor(Math.random() * spongebobQuotes.length)];
-                const randomPatrick = patrickQuotes[Math.floor(Math.random() * patrickQuotes.length)];
+                let newSpongeIndex, newPatrickIndex;
+
+                do {
+                    newSpongeIndex = Math.floor(Math.random() * spongebobQuotes.length);
+                } while (newSpongeIndex === lastSpongeIndex);
+                lastSpongeIndex = newSpongeIndex;
+
+                do {
+                    newPatrickIndex = Math.floor(Math.random() * patrickQuotes.length);
+                } while (newPatrickIndex === lastPatrickIndex);
+                lastPatrickIndex = newPatrickIndex;
+
+                const randomSponge = spongebobQuotes[newSpongeIndex];
+                const randomPatrick = patrickQuotes[newPatrickIndex];
 
                 spongebobBubble.classList.remove("show");
                 patrickBubble.classList.remove("show");
@@ -335,7 +342,6 @@ HTML
 
         window.onload = startTalking;
 
-        // 티처블 머신 제어 코드
         async function init() {
             const modelURL = URL + "model.json";
             const metadataURL = URL + "metadata.json";
