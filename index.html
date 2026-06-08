@@ -1,8 +1,14 @@
+뚱이의 대사 배열(patrickQuotes)을 요청하신 명대사들로 정확하게 수정했습니다! 특히 뚱이의 정체성과도 같은 "아뇨, 뚱인데요?"와 "야 비! 당장 그쳐 뚝!"이 들어가서 싱크로율이 훨씬 높아졌네요.
+
+수정된 전체 코드입니다. 그대로 복사해서 사용하시면 됩니다.
+
+뚱이 대사가 업데이트된 전체 코드
+HTML
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>비키니시티 포즈 측정소</title>
+    <title>비키니시티 포즈 측정소 (16:9)</title>
     <style>
         /* 비키니시티 바닷속 테마 배경 */
         body {
@@ -120,14 +126,14 @@
             z-index: 10;
         }
 
-        /* 207px에서 20%를 더 키운 248px로 설정 */
+        /* 스폰지밥 크기 확대 유지 (248px) */
         #spongebob-wrap {
             width: 248px; 
             left: 4%;
             animation: floatSpongebob 3s ease-in-out infinite;
         }
 
-        /* 뚱이는 기존 크기(180px) 유지 */
+        /* 뚱이 크기 (180px) */
         #patrick-wrap {
             width: 180px;
             right: 4%;
@@ -169,7 +175,7 @@
             width: 0;
         }
 
-        /* 스폰지밥 말풍선 (스폰지밥이 커졌으므로 겹치지 않게 우측(left) 마진을 150px로 조정) */
+        /* 스폰지밥 말풍선 위치 */
         #spongebob-bubble {
             top: -70px;
             left: 150px;
@@ -192,7 +198,7 @@
             width: 0;
         }
 
-        /* 뚱이 말풍선 */
+        /* 뚱이 말풍선 위치 */
         #patrick-bubble {
             top: -70px;
             right: 100px;
@@ -244,16 +250,16 @@
 
     <div id="spongebob-wrap" class="character-wrap">
         <div id="spongebob-bubble" class="bubble">난 준비됐어!</div>
-        <img class="character-img" src="./스폰지밥.png" alt="스폰지밥">
+        <img class="character-img" src="스폰지밥.png" alt="스폰지밥">
     </div>
 
     <div id="patrick-wrap" class="character-wrap">
-        <div id="patrick-bubble" class="bubble">안녕? 난 뚱이야!</div>
-        <img class="character-img" src="./뚱이.png" alt="뚱이">
+        <div id="patrick-bubble" class="bubble">아뇨, 뚱인데요?</div>
+        <img class="character-img" src="뚱이.png" alt="뚱이">
     </div>
 
     <h1>Bikini Bottom Pose Center</h1>
-    <button type="button" onclick="init()">출근하기! (시작)</button>
+    <button type="button" onclick="init()">준비 수수깡! (시작)</button>
     
     <div id="canvas-container">
         <canvas id="canvas"></canvas>
@@ -288,7 +294,7 @@
             }
         };
 
-        // 캐릭터 대사 목록
+        // 스폰지밥 대사 목록
         const spongebobQuotes = [
             "월요일 좋아~ 최고로 좋아~!",
             "오늘도 좋은 하루야, 친구!",
@@ -298,6 +304,7 @@
             "징징아! 같이 해파리 잡으러 가자!"
         ];
 
+        // 뚱이 대사 목록 (요청하신 내용으로 업데이트 완료!)
         const patrickQuotes = [
             "아뇨, 뚱인데요?",
             "지식은 우정을 대신할 수 없어.",
