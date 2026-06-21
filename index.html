@@ -2,420 +2,390 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>비키니시티 포즈 측정소</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비키니 시티 판별소</title>
     <style>
-        /* 비키니시티 바닷속 테마 배경 */
+        /* 기본 비키니 시티 수중 배경 */
         body {
-            background: linear-gradient(180deg, #1aa3ff 0%, #0044cc 100%);
-            color: #ffffff;
-            font-family: 'Comic Sans MS', 'Malgun Gothic', sans-serif;
-            text-align: center;
-            padding: 20px;
-            margin: 0;
+            background: linear-gradient(180deg, #1fa2ff 0%, #12d6df 50%, #a6ffcb 100%);
+            color: #fff;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Nanum Gothic', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            margin: 0;
+            overflow: hidden; /* 캐릭터들이 화면 밖으로 나가지 않게 */
             position: relative;
         }
 
-        /* 스폰지밥 스타일의 아기자기한 제목 */
         h1 {
-            color: #fffb00;
+            text-shadow: 3px 3px 0px #ed1b24, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000, 1px 1px 0px #000;
             font-size: 3rem;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 0px #ff6600, 6px 6px 0px #000;
             letter-spacing: 2px;
-        }
-
-        /* 네모네모 스폰지밥 느낌의 시작 버튼 */
-        button {
-            background-color: #fffb00;
-            color: #0044cc;
-            border: 4px solid #ff6600;
-            padding: 12px 40px;
-            font-size: 1.6rem;
-            font-weight: bold;
-            border-radius: 15px;
-            cursor: pointer;
-            box-shadow: 0 8px 0 #cc5200;
-            transition: all 0.2s;
             margin-bottom: 20px;
+            z-index: 10; /* 메인 UI가 위에 오도록 */
         }
 
-        button:hover {
-            background-color: #ffe600;
-            transform: translateY(2px);
-            box-shadow: 0 6px 0 #cc5200;
+        /* --- 배경 보글보글 거품 --- */
+        .bubble {
+            position: absolute;
+            bottom: -50px;
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: floatUp infinite linear;
+            z-index: 1;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-110vh) translateX(50px); opacity: 0; }
         }
 
-        button:active {
-            transform: translateY(8px);
-            box-shadow: 0 0px 0 #cc5200;
-        }
-
-        /* 캔버스 영역 - 바다 밑 모래사장 느낌의 테두리 */
-        #canvas-container {
-            margin: 20px auto;
-            border: 8px solid #ffcc66;
-            border-radius: 20px;
-            width: fit-content;
-            background-color: #001133;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            line-height: 0; 
-            overflow: hidden;
-        }
-
-        /* 결과창 */
-        #label-container {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #fffb00;
-            margin-top: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-        }
-
-        #label-container div {
-            margin: 10px 0;
-            background: rgba(0, 0, 0, 0.3);
-            display: inline-block;
-            padding: 5px 20px;
-            border-radius: 20px;
-        }
-
-        /* 집게리아 메뉴판 느낌의 도움말 상자 */
-        #help-box {
-            margin: 30px auto;
-            padding: 20px;
-            max-width: 500px;
-            background-color: #fff8e7;
-            border: 6px dashed #ff6600;
-            border-radius: 15px;
-            text-align: left;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        #help-title {
-            font-size: 1.8rem;
-            color: #d11a2a;
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-align: center;
-            border-bottom: 3px solid #ff6600;
-            padding-bottom: 5px;
-        }
-
-        #help-text {
-            font-size: 1.4rem;
-            color: #333333;
-            line-height: 1.6;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        /* ----------------------------------------------------
-           캐릭터 및 말풍선 레이아웃
-        ---------------------------------------------------- */
-        .character-wrap {
-            position: fixed;
-            top: 30%;
-            z-index: 10;
-        }
-
-        /* 스폰지밥 크기 확대 유지 (248px) */
-        #spongebob-wrap {
-            width: 248px; 
-            left: 4%;
-            animation: floatSpongebob 3s ease-in-out infinite;
-        }
-
-        /* 뚱이 크기 (180px) */
-        #patrick-wrap {
-            width: 180px;
-            right: 4%;
-            animation: floatPatrick 3.5s ease-in-out infinite;
-        }
-
-        .character-img {
-            width: 100%;
+        /* --- 둥둥 떠다니는 배경 캐릭터 및 말풍선 스타일 --- */
+        .floating-char {
+            position: absolute;
+            width: 150px; /* 캐릭터 크기 조정 */
             height: auto;
-            display: block;
+            animation: bobbing 4s infinite ease-in-out;
+            z-index: 2; /* 거품보다는 위, 메인UI보다는 아래 */
+            opacity: 0.9;
+        }
+
+        /* 각 캐릭터 위치 및 고유 애니메이션 속도 */
+        #spongebob { top: 15%; left: 10%; animation-delay: 0s; }
+        #patrick { top: 60%; left: 5%; animation-delay: 1s; width: 180px; }
+        #squidward { top: 30%; right: 8%; animation-delay: 2s; }
+
+        @keyframes bobbing {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(3deg); }
         }
 
         /* 말풍선 공통 스타일 */
-        .bubble {
+        .dialogue-box {
             position: absolute;
-            background: #ffffff;
-            color: #222222;
-            font-family: 'Malgun Gothic', sans-serif;
-            font-size: 1.1rem;
-            font-weight: bold;
-            padding: 12px 16px;
+            background: white;
+            color: #333;
             border-radius: 20px;
-            border: 3px solid #333333;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-            width: 160px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+            max-width: 200px;
+            opacity: 0; /* 평소에는 안 보임 */
+            transition: opacity 0.3s ease;
+            z-index: 3;
+        }
+        /* 말풍선 꼬리 */
+        .dialogue-box::after {
+            content: '';
+            position: absolute;
+            border-style: solid;
+            border-width: 10px;
+            display: block;
+            width: 0;
+            z-index: 1;
+        }
+
+        /* 캐릭터별 말풍선 위치 및 꼬리 방향 */
+        #sb-dialogue { top: 12%; left: 22%; }
+        #sb-dialogue::after { border-color: transparent white transparent transparent; left: -20px; top: 15px; }
+
+        #pat-dialogue { top: 58%; left: 23%; }
+        #pat-dialogue::after { border-color: transparent white transparent transparent; left: -20px; top: 15px; }
+
+        #sq-dialogue { top: 27%; right: 21%; }
+        #sq-dialogue::after { border-color: transparent transparent transparent white; right: -20px; top: 15px; }
+
+        /* 말풍선 보여주기 클래스 */
+        .show-dialogue { opacity: 1; }
+
+
+        /* --- 메인 판별기 UI 컨테이너 --- */
+        .main-container {
+            display: flex;
+            gap: 30px;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 25px;
+            border-radius: 25px;
+            border: 5px dashed #fff94f;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 240px;
+        }
+
+        /* 스폰지밥 느낌의 노란색 버튼 */
+        button {
+            background-color: #fff94f;
+            color: #333;
+            border: 4px solid #e1b12c;
+            border-radius: 20px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #e1b12c;
+            transition: all 0.1s ease;
+            margin-bottom: 20px;
+            font-family: inherit;
+        }
+        button:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+        button:disabled {
+            background-color: #ccc;
+            border-color: #999;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        #webcam-container {
+            border: 6px solid #ff9f43;
+            border-radius: 20px;
+            overflow: hidden;
+            width: 200px;
+            height: 200px;
+            background: #333;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* 결과 창: 한국어 이름 강조 스타일 */
+        #label-container {
+            margin-top: 20px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #fff94f;
+            text-shadow: 2px 2px 0px #000, -1px -1px 0px #000;
+            background: rgba(0, 0, 0, 0.6);
+            border: 3px solid #fff;
+            padding: 15px;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
             text-align: center;
-            word-break: keep-all;
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out;
-            pointer-events: none;
+            min-height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .bubble::after {
-            content: '';
-            position: absolute;
-            border-style: solid;
-            display: block;
-            width: 0;
+        /* 결과 이미지 창 */
+        #result-image-container {
+            border: 6px solid #10ac84;
+            border-radius: 20px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
         }
-
-        #spongebob-bubble {
-            top: -70px;
-            left: 150px;
-        }
-        #spongebob-bubble::after {
-            top: 60px;
-            left: 30px;
-            border-width: 15px 15px 0 0;
-            border-color: #ffffff transparent transparent transparent;
-        }
-        #spongebob-bubble::before {
-            content: '';
-            position: absolute;
-            top: 60px;
-            left: 28px;
-            border-style: solid;
-            border-width: 18px 18px 0 0;
-            border-color: #333333 transparent transparent transparent;
-            display: block;
-            width: 0;
-        }
-
-        #patrick-bubble {
-            top: -70px;
-            right: 100px;
-        }
-        #patrick-bubble::after {
-            top: 60px;
-            right: 30px;
-            border-width: 15px 0 0 15px;
-            border-color: #ffffff transparent transparent transparent;
-        }
-        #patrick-bubble::before {
-            content: '';
-            position: absolute;
-            top: 60px;
-            right: 28px;
-            border-style: solid;
-            border-width: 18px 0 0 18px;
-            border-color: #333333 transparent transparent transparent;
-            display: block;
-            width: 0;
-        }
-
-        .bubble.show {
-            opacity: 1;
-        }
-
-        @keyframes floatSpongebob {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-25px) rotate(3deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-
-        @keyframes floatPatrick {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(-4deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-
-        @media (max-width: 1250px) {
-            .character-wrap {
-                display: none;
-            }
+        #result-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
     </style>
 </head>
 <body>
 
-    <div id="spongebob-wrap" class="character-wrap">
-        <div id="spongebob-bubble" class="bubble">난 준비됐어!</div>
-        <img class="character-img" src="./스폰지밥.png" alt="스폰지밥">
+    <img src="a.png" id="spongebob" class="floating-char" alt="스폰지밥">
+    <img src="b.png" id="patrick" class="floating-char" alt="뚱이">
+    <img src="c.png" id="squidward" class="floating-char" alt="징징이">
+
+    <div id="sb-dialogue" class="dialogue-box">월요일 좋아! 같이 사진 찍자!</div>
+    <div id="pat-dialogue" class="dialogue-box">으아암... 이거 먹는 거야?</div>
+    <div id="sq-dialogue" class="dialogue-box">조용히 좀 해, 이 바보들아...</div>
+
+    <h1>비키니 시티 인물 판별소 🧽</h1>
+
+    <div class="main-container">
+        <div class="panel">
+            <button type="button" id="action-btn" onclick="handleAction()">카메라 켜기</button>
+            <div id="webcam-container"></div>
+            <div id="label-container">준비 완료!</div>
+        </div>
+
+        <div class="panel">
+            <div style="margin-bottom: 20px; font-weight: bold; font-size: 1.3rem; color: #fff94f; text-shadow: 1px 1px 2px #000;">가장 닮은 이웃</div>
+            <div id="result-image-container">
+                <span style="color: #666; font-size: 0.9rem;">사진을 찍어보세요</span>
+            </div>
+        </div>
     </div>
 
-    <div id="patrick-wrap" class="character-wrap">
-        <div id="patrick-bubble" class="bubble">안녕? 난 뚱이야!</div>
-        <img class="character-img" src="./뚱이.png" alt="뚱이">
-    </div>
-
-    <h1>비키니시티 포즈 측정소</h1>
-    <button type="button" onclick="init()">출근하기!(시작)</button>
-    
-    <div id="canvas-container">
-        <canvas id="canvas"></canvas>
-    </div>
-
-    <div id="label-container"></div>
-
-    <div id="help-box">
-        <div id="help-title">징징이의 잔소리 (도움말)</div>
-        <div id="help-text">시작 버튼을 누르고 카메라를 똑바로 쳐다보라구!</div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     <script type="text/javascript">
-        const URL = "https://teachablemachine.withgoogle.com/models/KS4rMAlrWP/";
-        let model, webcam, ctx, labelContainer, maxPredictions;
-        let helpTitle, helpText;
+        // --- 설정 및 변수 ---
+        const URL = "https://teachablemachine.withgoogle.com/models/H3nEd0_Pv/";
+        let model, webcam, labelContainer, maxPredictions;
+        let isSetup = false;
+        let isRunning = false; 
+        let animationId;       
 
-        const POSE_GUIDE = {
-            "Class 1": {
-                title: "월요일 좋아 자세! (바른 자세)",
-                text: "스폰지밥처럼 활기차고 곧은 자세야! 아주 좋아!"
-            },
-            "Class 2": {
-                title: "해파리 사냥 금지 (거북목 주의)",
-                text: "목이 플랑크톤처럼 앞으로 나와있어! 어깨를 펴고 턱을 당겨!"
-            },
-            "Class 3": {
-                title: "뚱이처럼 삐딱함 (몸 기울어짐)",
-                text: "몸이 한쪽으로 쏠렸어! 양쪽 골반과 어깨 수평을 맞춰줘!"
+        const koreanNames = ["네트", "워커", "톰", "프레드", "낸시", "헤럴드", "조개맨", "인어소년"];
+
+        // 말풍선 엘리먼트
+        const sbDial = document.getElementById('sb-dialogue');
+        const patDial = document.getElementById('pat-dialogue');
+        const sqDial = document.getElementById('sq-dialogue');
+
+        // 캐릭터별 평소 멘트 배열
+        const sbIdleQuotes = ["월요일 좋아!", "난 준비됐어!", "집게리아로 오세요!", "다람이한테 운동 배우러 갈까?"];
+        const patIdleQuotes = ["으아암...", "아무것도 안 하기가 내 전공이야.", "바보 아니야, 뚱이야.", "내 배꼽 어디 갔지?"];
+        const sqIdleQuotes = ["언제쯤 조용해질까...", "클라리넷 연습해야 해.", "예술을 모르는 바보들.", "집게사장, 월급 좀 올려줘."];
+
+        // --- 초기화 함수 ---
+        function initBackground() {
+            // 거품 생성
+            for (let i = 0; i < 15; i++) {
+                let bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.width = bubble.style.height = `${Math.random() * 40 + 10}px`;
+                bubble.style.animationDuration = `${Math.random() * 5 + 4}s`;
+                bubble.style.animationDelay = `${Math.random() * 3}s`;
+                document.body.appendChild(bubble);
             }
-        };
-
-        const spongebobQuotes = [
-            "월요일 좋아~ 최고로 좋아~!",
-            "오늘도 좋은 하루야, 친구!",
-            "집게리아 버거 먹고 싶다!",
-            "거기 너, 자세가 아주 멋진걸?",
-            "헤헤헤헤헿! 난 준비됐어!",
-            "징징아! 같이 해파리 잡으러 가자!"
-        ];
-
-        const patrickQuotes = [
-            "아뇨, 뚱인데요?",
-            "지식은 우정을 대신할 수 없어.",
-            "나 배고파... 내 사랑 게살버거...",
-            "음... 생각하는 건 너무 어려워.",
-            "야 비! 당장 그쳐 뚝!",
-            "다리가 저릴 땐 누워있는 게 최고야."
-        ];
-
-        let lastSpongeIndex = -1;
-        let lastPatrickIndex = -1;
-
-        function startTalking() {
-            const spongebobBubble = document.getElementById("spongebob-bubble");
-            const patrickBubble = document.getElementById("patrick-bubble");
-
-            spongebobBubble.classList.add("show");
-            patrickBubble.classList.add("show");
-
-            setInterval(() => {
-                let newSpongeIndex, newPatrickIndex;
-
-                do {
-                    newSpongeIndex = Math.floor(Math.random() * spongebobQuotes.length);
-                } while (newSpongeIndex === lastSpongeIndex);
-                lastSpongeIndex = newSpongeIndex;
-
-                do {
-                    newPatrickIndex = Math.floor(Math.random() * patrickQuotes.length);
-                } while (newPatrickIndex === lastPatrickIndex);
-                lastPatrickIndex = newPatrickIndex;
-
-                const randomSponge = spongebobQuotes[newSpongeIndex];
-                const randomPatrick = patrickQuotes[newPatrickIndex];
-
-                spongebobBubble.classList.remove("show");
-                patrickBubble.classList.remove("show");
-
-                setTimeout(() => {
-                    spongebobBubble.innerText = randomSponge;
-                    patrickBubble.innerText = randomPatrick;
-                    spongebobBubble.classList.add("show");
-                    patrickBubble.classList.add("show");
-                }, 400);
-
-            }, 5000);
+            // 평소 멘트 랜덤 시작
+            changeDialogue(sbDial, sbIdleQuotes);
+            changeDialogue(patDial, patIdleQuotes);
+            changeDialogue(sqDial, sqIdleQuotes);
+            
+            // 5~8초마다 멘트 변경
+            setInterval(() => changeDialogue(sbDial, sbIdleQuotes), 6000 + Math.random() * 2000);
+            setInterval(() => changeDialogue(patDial, patIdleQuotes), 7000 + Math.random() * 2000);
+            setInterval(() => changeDialogue(sqDial, sqIdleQuotes), 8000 + Math.random() * 2000);
         }
 
-        window.onload = startTalking;
+        // 말풍선 텍스트 변경 및 보여주기
+        function changeDialogue(el, quotes, duration = 4000) {
+            if (!isRunning && quotes.length > 0) { // 카메라 구동중이 아닐 때만 평소 멘트
+                el.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+            }
+            el.classList.add('show-dialogue');
+            setTimeout(() => el.classList.remove('show-dialogue'), duration);
+        }
+
+        // --- 메인 로직 ---
+        window.onload = initBackground; // 페이지 로드 시 배경 설정
+
+        async function handleAction() {
+            const btn = document.getElementById("action-btn");
+            
+            if (!isSetup) {
+                btn.innerText = "로딩 중...";
+                btn.disabled = true;
+                await init();
+                btn.innerText = "찰칵! 멈추기";
+                btn.disabled = false;
+                isSetup = true;
+                isRunning = true;
+                return;
+            }
+
+            if (isRunning) {
+                cancelAnimationFrame(animationId);
+                isRunning = false;
+                await predict();
+                btn.innerText = "다시 찍기";
+            } else {
+                animationId = window.requestAnimationFrame(loop);
+                isRunning = true;
+                btn.innerText = "찰칵! 멈추기";
+                document.getElementById("label-container").innerText = "분석 중...";
+                document.getElementById("result-image-container").innerHTML = '<span style="color: #666; font-size: 0.9rem;">사진을 찍어주세요</span>';
+            }
+        }
 
         async function init() {
             const modelURL = URL + "model.json";
             const metadataURL = URL + "metadata.json";
-
-            model = await tmPose.load(modelURL, metadataURL);
+            model = await tmImage.load(modelURL, metadataURL);
             maxPredictions = model.getTotalClasses();
-
-            const width = 480;
-            const height = 270;
-            const flip = true; 
-            
-            webcam = new tmPose.Webcam(width, height, flip); 
-            await webcam.setup(); 
+            const flip = true;
+            webcam = new tmImage.Webcam(200, 200, flip);
+            await webcam.setup();
             await webcam.play();
-            window.requestAnimationFrame(loop);
-
-            const canvas = document.getElementById("canvas");
-            canvas.width = width; 
-            canvas.height = height;
-            ctx = canvas.getContext("2d");
-            
+            animationId = window.requestAnimationFrame(loop);
+            document.getElementById("webcam-container").appendChild(webcam.canvas);
             labelContainer = document.getElementById("label-container");
-            labelContainer.innerHTML = ""; 
-            for (let i = 0; i < maxPredictions; i++) { 
-                labelContainer.appendChild(document.createElement("div"));
-            }
-
-            helpTitle = document.getElementById("help-title");
-            helpText = document.getElementById("help-text");
         }
 
-        async function loop(timestamp) {
+        async function loop() {
             webcam.update(); 
-            await predict();
-            window.requestAnimationFrame(loop);
+            animationId = window.requestAnimationFrame(loop);
         }
 
+        // --- 결과 판별 및 캐릭터 반응 ---
         async function predict() {
-            const { pose, posenetOutput } = await model.estimatePose(webcam.canvas);
-            const prediction = await model.predict(posenetOutput);
-
-            let highestClass = "";
-            let highestProb = 0;
+            const prediction = await model.predict(webcam.canvas);
+            let highestSuccessIndex = 0;
+            let highestProbability = 0;
 
             for (let i = 0; i < maxPredictions; i++) {
-                const className = prediction[i].className;
-                const probability = prediction[i].probability;
-                
-                labelContainer.childNodes[i].innerHTML = 
-                    `${className}: ${(probability * 100).toFixed(0)}%`;
-
-                if (probability > highestProb) {
-                    highestProb = probability;
-                    highestClass = className;
+                if (prediction[i].probability > highestProbability) {
+                    highestProbability = prediction[i].probability;
+                    highestSuccessIndex = i;
                 }
             }
 
-            if (highestProb > 0.70 && POSE_GUIDE[highestClass]) {
-                helpTitle.innerText = POSE_GUIDE[highestClass].title;
-                helpText.innerText = POSE_GUIDE[highestClass].text;
+            const krName = koreanNames[highestSuccessIndex] || prediction[highestSuccessIndex].className;
+            labelContainer.innerText = krName;
+
+            // 결과 이미지 출력
+            const imgNumber = highestSuccessIndex + 1;
+            if (imgNumber <= 8) {
+                const imgContainer = document.getElementById("result-image-container");
+                imgContainer.innerHTML = `<img src="${imgNumber}.png" alt="${krName}">`;
             }
 
-            drawPose(pose);
-        }
+            // **핵심: 결과에 따른 캐릭터 반응 (말풍선)**
+            
+            // 1. 스폰지밥: 긍정적이고 하이텐션
+            let sbResultQuotes = [
+                `와아! ${krName}님! 우리 집게리아에서 같이 알바 안 할래?`,
+                `하하하! ${krName}님, 나랑은 전혀 안 닮았지만 정말 멋져!`,
+                `대박! 비키니 시티의 새로운 스타 ${krName}님이다!`
+            ];
+            
+            // 2. 뚱이: 바보 같지만 순수함
+            let patResultQuotes = [
+                `어? ${krName}? 먹는 거야?`,
+                `나랑 안 닮았다고? 그럼 내가 ${krName} 할래.`,
+                `안녕? 나는 뚱이야. 너는 누구였더라?`
+            ];
 
-        function drawPose(pose) {
-            if (webcam.canvas) {
-                ctx.drawImage(webcam.canvas, 0, 0);
-                if (pose) {
-                    const minPartConfidence = 0.5;
-                    tmPose.drawKeypoints(pose.keypoints, minPartConfidence, ctx);
-                    tmPose.drawSkeleton(pose.keypoints, minPartConfidence, ctx);
-                }
-            }
+            // 3. 징징이: 냉소적이고 귀찮아함
+            let sqResultQuotes = [
+                `흥, 나처럼 예술적인 면모는 눈 씻고 봐도 없군.`,
+                `나랑 안 닮아서 정말 다행이야. 저 바보들이랑 노는 건 질색이라고.`,
+                `${krName}? 또 이상한 이웃이 늘었어... 조용히 좀 살아.`
+            ];
+
+            // 말풍선 내용 강제 변경 및 보여주기
+            sbDial.innerText = sbResultQuotes[Math.floor(Math.random() * sbResultQuotes.length)];
+            patDial.innerText = patResultQuotes[Math.floor(Math.random() * patResultQuotes.length)];
+            sqDial.innerText = sqResultQuotes[Math.floor(Math.random() * sqResultQuotes.length)];
+
+            changeDialogue(sbDial, [], 6000); // 6초간 보여줌
+            changeDialogue(patDial, [], 6000);
+            changeDialogue(sqDial, [], 6000);
         }
     </script>
 </body>
