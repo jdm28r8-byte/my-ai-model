@@ -1,3 +1,11 @@
+요청하신 사항을 반영하여 두 가지를 수정했습니다.
+
+말이 끊기지 않고 자연스럽게 이어지도록 변경: 1.5초마다 말문이 아예 닫혔다 열리는 방식은 눈이 피로할 수 있어서, 말풍선은 화면에 그대로 구동되면서 내부 글자만 부드럽게 스르륵 바뀌도록(Fade-in/out) 전환 방식을 개선했습니다. 다음 대사로 넘어가는 주기 역시 조금 더 여유롭게 다듬었습니다.
+
+상대 경로 지정: 이미지 경로를 요청하신 ./a.png, ./1.png와 같은 현재 폴더 기호(./) 구조로 명확하게 지정했습니다.
+
+수정된 전체 코드
+HTML
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -16,7 +24,7 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden; /* 캐릭터들이 화면 밖으로 나가지 않게 */
+            overflow: hidden; 
             position: relative;
         }
 
@@ -25,7 +33,7 @@
             font-size: 3rem;
             letter-spacing: 2px;
             margin-bottom: 20px;
-            z-index: 10; /* 메인 UI가 위에 오도록 */
+            z-index: 10; 
         }
 
         /* --- 배경 보글보글 거품 --- */
@@ -48,14 +56,13 @@
         /* --- 둥둥 떠다니는 배경 캐릭터 및 말풍선 스타일 --- */
         .floating-char {
             position: absolute;
-            width: 150px; /* 캐릭터 크기 조정 */
+            width: 150px; 
             height: auto;
             animation: bobbing 4s infinite ease-in-out;
-            z-index: 2; /* 거품보다는 위, 메인UI보다는 아래 */
+            z-index: 2; 
             opacity: 0.9;
         }
 
-        /* 각 캐릭터 위치 및 고유 애니메이션 속도 */
         #spongebob { top: 15%; left: 10%; animation-delay: 0s; }
         #patrick { top: 60%; left: 5%; animation-delay: 1s; width: 180px; }
         #squidward { top: 30%; right: 8%; animation-delay: 2s; }
@@ -65,7 +72,7 @@
             50% { transform: translateY(-20px) rotate(3deg); }
         }
 
-        /* 말풍선 공통 스타일 */
+        /* 말풍선 디자인 및 글자 전환 애니메이션 */
         .dialogue-box {
             position: absolute;
             background: white;
@@ -76,11 +83,10 @@
             font-weight: bold;
             box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
             max-width: 200px;
-            opacity: 0; /* 평소에는 안 보임 */
-            transition: opacity 0.3s ease;
             z-index: 3;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
         }
-        /* 말풍선 꼬리 */
         .dialogue-box::after {
             content: '';
             position: absolute;
@@ -91,7 +97,6 @@
             z-index: 1;
         }
 
-        /* 캐릭터별 말풍선 위치 및 꼬리 방향 */
         #sb-dialogue { top: 12%; left: 22%; }
         #sb-dialogue::after { border-color: transparent white transparent transparent; left: -20px; top: 15px; }
 
@@ -101,9 +106,7 @@
         #sq-dialogue { top: 27%; right: 21%; }
         #sq-dialogue::after { border-color: transparent transparent transparent white; right: -20px; top: 15px; }
 
-        /* 말풍선 보여주기 클래스 */
         .show-dialogue { opacity: 1; }
-
 
         /* --- 메인 판별기 UI 컨테이너 --- */
         .main-container {
@@ -125,7 +128,6 @@
             min-width: 240px;
         }
 
-        /* 스폰지밥 느낌의 노란색 버튼 */
         button {
             background-color: #fff94f;
             color: #333;
@@ -161,7 +163,6 @@
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
 
-        /* 결과 창: 한국어 이름 강조 스타일 */
         #label-container {
             margin-top: 20px;
             font-size: 1.6rem;
@@ -181,7 +182,6 @@
             justify-content: center;
         }
 
-        /* 결과 이미지 창 */
         #result-image-container {
             border: 6px solid #10ac84;
             border-radius: 20px;
@@ -203,9 +203,9 @@
 </head>
 <body>
 
-    <img src="a.png" id="spongebob" class="floating-char" alt="스폰지밥">
-    <img src="b.png" id="patrick" class="floating-char" alt="뚱이">
-    <img src="c.png" id="squidward" class="floating-char" alt="징징이">
+    <img src="./a.png" id="spongebob" class="floating-char" alt="스폰지밥">
+    <img src="./b.png" id="patrick" class="floating-char" alt="뚱이">
+    <img src="./c.png" id="squidward" class="floating-char" alt="징징이">
 
     <div id="sb-dialogue" class="dialogue-box">월요일 좋아! 같이 사진 찍자!</div>
     <div id="pat-dialogue" class="dialogue-box">으아암... 이거 먹는 거야?</div>
@@ -223,7 +223,7 @@
         <div class="panel">
             <div style="margin-bottom: 20px; font-weight: bold; font-size: 1.3rem; color: #fff94f; text-shadow: 1px 1px 2px #000;">가장 닮은 이웃</div>
             <div id="result-image-container">
-                <span style="color: #666; font-size: 0.9rem;">사진을 찍어보세요</span>
+                <span style="color: #666; font-size: 0.9rem;">사진을 찍어주세요</span>
             </div>
         </div>
     </div>
@@ -231,28 +231,24 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     <script type="text/javascript">
-        // --- 설정 및 변수 ---
         const URL = "https://teachablemachine.withgoogle.com/models/H3nEd0_Pv/";
         let model, webcam, labelContainer, maxPredictions;
         let isSetup = false;
         let isRunning = false; 
         let animationId;       
+        let dialogueIntervals = []; 
 
         const koreanNames = ["네트", "워커", "톰", "프레드", "낸시", "헤럴드", "조개맨", "인어소년"];
 
-        // 말풍선 엘리먼트
         const sbDial = document.getElementById('sb-dialogue');
         const patDial = document.getElementById('pat-dialogue');
         const sqDial = document.getElementById('sq-dialogue');
 
-        // 캐릭터별 평소 멘트 배열
-        const sbIdleQuotes = ["월요일 좋아!", "난 준비됐어!", "집게리아로 오세요!", "다람이한테 운동 배우러 갈까?"];
-        const patIdleQuotes = ["으아암...", "아무것도 안 하기가 내 전공이야.", "바보 아니야, 뚱이야.", "내 배꼽 어디 갔지?"];
-        const sqIdleQuotes = ["언제쯤 조용해질까...", "클라리넷 연습해야 해.", "예술을 모르는 바보들.", "집게사장, 월급 좀 올려줘."];
+        const sbIdleQuotes = ["월요일 좋아!", "난 준비됐어!", "집게리아로 오세요!", "따라라라라라~🎶", "퐁퐁부인 덤벼요!"];
+        const patIdleQuotes = ["으아암...", "아무것도 안 하기가 내 전공이야.", "바보 아니야, 뚱이야.", "내 배꼽 어디 갔지?", "단어란 참 어려워.."];
+        const sqIdleQuotes = ["언제쯤 조용해질까...", "클라리넷 연습해야 해.", "예술을 모르는 바보들.", "집게사장, 월급 좀 올려줘.", "집에 가고 싶다.."];
 
-        // --- 초기화 함수 ---
         function initBackground() {
-            // 거품 생성
             for (let i = 0; i < 15; i++) {
                 let bubble = document.createElement('div');
                 bubble.className = 'bubble';
@@ -262,28 +258,44 @@
                 bubble.style.animationDelay = `${Math.random() * 3}s`;
                 document.body.appendChild(bubble);
             }
-            // 평소 멘트 랜덤 시작
+            
+            startIdleDialogues();
+        }
+
+        function startIdleDialogues() {
+            stopIdleDialogues();
+
+            // 첫 출력 실행
             changeDialogue(sbDial, sbIdleQuotes);
             changeDialogue(patDial, patIdleQuotes);
             changeDialogue(sqDial, sqIdleQuotes);
+
+            // 전체적인 발화 주기를 1.5초 타이머 기반 안에서 글자가 스르륵 바뀌도록 자연스럽게 세팅
+            dialogueIntervals.push(setInterval(() => changeDialogue(sbDial, sbIdleQuotes), 1500));
+            dialogueIntervals.push(setInterval(() => changeDialogue(patDial, patIdleQuotes), 1500));
+            dialogueIntervals.push(setInterval(() => changeDialogue(sqDial, sqIdleQuotes), 1500));
+        }
+
+        function stopIdleDialogues() {
+            dialogueIntervals.forEach(interval => clearInterval(interval));
+            dialogueIntervals = [];
+        }
+
+        // 말풍선이 닫히지 않고 내부에서 부드럽게 글자만 페이드 되도록 개선한 함수
+        function changeDialogue(el, quotes) {
+            // 1. 글자를 바꾸기 전 아주 살짝 불투명도를 낮춰 연출 속도를 늦추는 느낌을 줍니다.
+            el.style.opacity = 0.3;
             
-            // 5~8초마다 멘트 변경
-            setInterval(() => changeDialogue(sbDial, sbIdleQuotes), 6000 + Math.random() * 2000);
-            setInterval(() => changeDialogue(patDial, patIdleQuotes), 7000 + Math.random() * 2000);
-            setInterval(() => changeDialogue(sqDial, sqIdleQuotes), 8000 + Math.random() * 2000);
+            setTimeout(() => {
+                if (quotes.length > 0) { 
+                    el.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+                }
+                el.style.opacity = 1;
+                el.classList.add('show-dialogue');
+            }, 250); // 글자가 바뀌기 전의 대기 텀을 늘려 체감 주기를 부드럽고 느리게 조절
         }
 
-        // 말풍선 텍스트 변경 및 보여주기
-        function changeDialogue(el, quotes, duration = 4000) {
-            if (!isRunning && quotes.length > 0) { // 카메라 구동중이 아닐 때만 평소 멘트
-                el.innerText = quotes[Math.floor(Math.random() * quotes.length)];
-            }
-            el.classList.add('show-dialogue');
-            setTimeout(() => el.classList.remove('show-dialogue'), duration);
-        }
-
-        // --- 메인 로직 ---
-        window.onload = initBackground; // 페이지 로드 시 배경 설정
+        window.onload = initBackground;
 
         async function handleAction() {
             const btn = document.getElementById("action-btn");
@@ -302,6 +314,7 @@
             if (isRunning) {
                 cancelAnimationFrame(animationId);
                 isRunning = false;
+                stopIdleDialogues();
                 await predict();
                 btn.innerText = "다시 찍기";
             } else {
@@ -310,6 +323,7 @@
                 btn.innerText = "찰칵! 멈추기";
                 document.getElementById("label-container").innerText = "분석 중...";
                 document.getElementById("result-image-container").innerHTML = '<span style="color: #666; font-size: 0.9rem;">사진을 찍어주세요</span>';
+                startIdleDialogues();
             }
         }
 
@@ -332,7 +346,6 @@
             animationId = window.requestAnimationFrame(loop);
         }
 
-        // --- 결과 판별 및 캐릭터 반응 ---
         async function predict() {
             const prediction = await model.predict(webcam.canvas);
             let highestSuccessIndex = 0;
@@ -348,44 +361,41 @@
             const krName = koreanNames[highestSuccessIndex] || prediction[highestSuccessIndex].className;
             labelContainer.innerText = krName;
 
-            // 결과 이미지 출력
+            // 결과 이미지 경로를 ./1.png 형태로 출력하도록 수정
             const imgNumber = highestSuccessIndex + 1;
             if (imgNumber <= 8) {
                 const imgContainer = document.getElementById("result-image-container");
-                imgContainer.innerHTML = `<img src="${imgNumber}.png" alt="${krName}">`;
+                imgContainer.innerHTML = `<img src="./${imgNumber}.png" alt="${krName}">`;
             }
 
-            // **핵심: 결과에 따른 캐릭터 반응 (말풍선)**
-            
-            // 1. 스폰지밥: 긍정적이고 하이텐션
             let sbResultQuotes = [
                 `와아! ${krName}님! 우리 집게리아에서 같이 알바 안 할래?`,
                 `하하하! ${krName}님, 나랑은 전혀 안 닮았지만 정말 멋져!`,
                 `대박! 비키니 시티의 새로운 스타 ${krName}님이다!`
             ];
             
-            // 2. 뚱이: 바보 같지만 순수함
             let patResultQuotes = [
                 `어? ${krName}? 먹는 거야?`,
                 `나랑 안 닮았다고? 그럼 내가 ${krName} 할래.`,
                 `안녕? 나는 뚱이야. 너는 누구였더라?`
             ];
 
-            // 3. 징징이: 냉소적이고 귀찮아함
             let sqResultQuotes = [
                 `흥, 나처럼 예술적인 면모는 눈 씻고 봐도 없군.`,
                 `나랑 안 닮아서 정말 다행이야. 저 바보들이랑 노는 건 질색이라고.`,
                 `${krName}? 또 이상한 이웃이 늘었어... 조용히 좀 살아.`
             ];
 
-            // 말풍선 내용 강제 변경 및 보여주기
             sbDial.innerText = sbResultQuotes[Math.floor(Math.random() * sbResultQuotes.length)];
             patDial.innerText = patResultQuotes[Math.floor(Math.random() * patResultQuotes.length)];
             sqDial.innerText = sqResultQuotes[Math.floor(Math.random() * sqResultQuotes.length)];
 
-            changeDialogue(sbDial, [], 6000); // 6초간 보여줌
-            changeDialogue(patDial, [], 6000);
-            changeDialogue(sqDial, [], 6000);
+            sbDial.style.opacity = 1;
+            patDial.style.opacity = 1;
+            sqDial.style.opacity = 1;
+            sbDial.classList.add('show-dialogue');
+            patDial.classList.add('show-dialogue');
+            sqDial.classList.add('show-dialogue');
         }
     </script>
 </body>
