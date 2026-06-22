@@ -55,10 +55,14 @@
             opacity: 0.9;
         }
 
-        /* 캐릭터 위치는 원래대로(원안 복구) */
+        /* 캐릭터 위치 설정 */
         #spongebob { top: 15%; left: 10%; animation-delay: 0s; }
-        #patrick { top: 60%; left: 5%; animation-delay: 1s; width: 180px; }
-        #squidward { top: 30%; right: 8%; animation-delay: 2s; }
+        
+        /* 뚱이 이미지 좌우 반전 */
+        #patrick { top: 60%; left: 5%; animation-delay: 1s; width: 180px; transform: scaleX(-1); }
+        
+        /* 징징이 이미지 좌우 반전 */
+        #squidward { top: 30%; right: 8%; animation-delay: 2s; transform: scaleX(-1); }
 
         @keyframes bobbing {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -90,14 +94,14 @@
             z-index: 1;
         }
 
-        /* 말풍선 위치만 캐릭터 쪽으로 가깝게 수정 */
-        #sb-dialogue { top: 12%; left: 17%; }
+        /* 말풍선 위치 설정 (캐릭터 이동에 맞춰 조정) */
+        #sb-dialogue { top: 12%; left: 22%; }
         #sb-dialogue::after { border-color: transparent white transparent transparent; left: -20px; top: 15px; }
 
-        #pat-dialogue { top: 58%; left: 14%; }
+        #pat-dialogue { top: 58%; left: 23%; }
         #pat-dialogue::after { border-color: transparent white transparent transparent; left: -20px; top: 15px; }
 
-        #sq-dialogue { top: 27%; right: 15%; }
+        #sq-dialogue { top: 27%; right: 21%; }
         #sq-dialogue::after { border-color: transparent transparent transparent white; right: -20px; top: 15px; }
 
         .show-dialogue { opacity: 1; }
@@ -355,6 +359,7 @@
             const imgNumber = highestSuccessIndex + 1;
             if (imgNumber <= 8) {
                 const imgContainer = document.getElementById("result-image-container");
+                // 원래 요청대로 이미지 경로가 다시 ./로 롤백되었습니다.
                 imgContainer.innerHTML = `<img src="./${imgNumber}.png" alt="${krName}">`;
             }
 
