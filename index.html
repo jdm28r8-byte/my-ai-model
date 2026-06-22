@@ -227,7 +227,7 @@
         let model, webcam, labelContainer, maxPredictions;
         let isSetup = false;
         let isRunning = false; 
-        let animationId;       
+        let animationId;        
         let dialogueIntervals = []; 
 
         const koreanNames = ["네트", "워커", "톰", "프레드", "낸시", "헤럴드", "조개맨", "인어소년"];
@@ -236,9 +236,10 @@
         const patDial = document.getElementById('pat-dialogue');
         const sqDial = document.getElementById('sq-dialogue');
 
-        const sbIdleQuotes = ["월요일 좋아!", "난 준비됐어!", "집게리아로 오세요!", "따라라라라라~🎶", "퐁퐁부인 덤벼요!"];
-        const patIdleQuotes = ["으아암...", "아무것도 안 하기가 내 전공이야.", "바보 아니야, 뚱이야.", "내 배꼽 어디 갔지?", "단어란 참 어려워.."];
-        const sqIdleQuotes = ["언제쯤 조용해질까...", "클라리넷 연습해야 해.", "예술을 모르는 바보들.", "집게사장, 월급 좀 올려줘.", "집에 가고 싶다.."];
+        // --- [수정] 평소(비교 전) 대사 목록 (기대하는 대사 추가) ---
+        const sbIdleQuotes = ["월요일 좋아!", "난 준비됐어!", "집게리아로 오세요!", "따라라라라라~🎶", "나랑 닮은 이웃이 나오면 좋겠다!"];
+        const patIdleQuotes = ["으아암...", "아무것도 안 하기가 내 전공이야.", "나랑 닮으면 맛있는 거 주나?", "내 배꼽 어디 갔지?", "단어란 참 어려워.."];
+        const sqIdleQuotes = ["언제쯤 조용해질까...", "클라리넷 연습해야 해.", "나랑 안 닮은 정상적인 사람이어야 할 텐데.", "집게사장, 월급 좀 올려줘.", "집에 가고 싶다.."];
 
         function initBackground() {
             for (let i = 0; i < 15; i++) {
@@ -262,10 +263,10 @@
             changeDialogue(patDial, patIdleQuotes);
             changeDialogue(sqDial, sqIdleQuotes);
 
-            // 전체적인 발화 주기를 1.5초 타이머 기반 안에서 글자가 스르륵 바뀌도록 자연스럽게 세팅
-            dialogueIntervals.push(setInterval(() => changeDialogue(sbDial, sbIdleQuotes), 1500));
-            dialogueIntervals.push(setInterval(() => changeDialogue(patDial, patIdleQuotes), 1500));
-            dialogueIntervals.push(setInterval(() => changeDialogue(sqDial, sqIdleQuotes), 1500));
+            // 평소 주기 루프 돌리기
+            dialogueIntervals.push(setInterval(() => changeDialogue(sbDial, sbIdleQuotes), 2500));
+            dialogueIntervals.push(setInterval(() => changeDialogue(patDial, patIdleQuotes), 2500));
+            dialogueIntervals.push(setInterval(() => changeDialogue(sqDial, sqIdleQuotes), 2500));
         }
 
         function stopIdleDialogues() {
@@ -273,9 +274,7 @@
             dialogueIntervals = [];
         }
 
-        // 말풍선이 닫히지 않고 내부에서 부드럽게 글자만 페이드 되도록 개선한 함수
         function changeDialogue(el, quotes) {
-            // 1. 글자를 바꾸기 전 아주 살짝 불투명도를 낮춰 연출 속도를 늦추는 느낌을 줍니다.
             el.style.opacity = 0.3;
             
             setTimeout(() => {
@@ -284,7 +283,7 @@
                 }
                 el.style.opacity = 1;
                 el.classList.add('show-dialogue');
-            }, 250); // 글자가 바뀌기 전의 대기 텀을 늘려 체감 주기를 부드럽고 느리게 조절
+            }, 250);
         }
 
         window.onload = initBackground;
@@ -306,15 +305,18 @@
             if (isRunning) {
                 cancelAnimationFrame(animationId);
                 isRunning = false;
-                stopIdleDialogues();
+                stopIdleDialogues(); // 사진을 찍으면 평소 대사 루프를 잠깐 멈춤
                 await predict();
                 btn.innerText = "다시 찍기";
             } else {
+                // --- [수정] 다시 찍기를 누르면 평소 상태로 돌아가도록 세팅 ---
                 animationId = window.requestAnimationFrame(loop);
                 isRunning = true;
                 btn.innerText = "찰칵! 멈추기";
                 document.getElementById("label-container").innerText = "분석 중...";
                 document.getElementById("result-image-container").innerHTML = '<span style="color: #666; font-size: 0.9rem;">사진을 찍어주세요</span>';
+                
+                // 다시 평소 대사 상태로 롤백 및 루프 재시작
                 startIdleDialogues();
             }
         }
@@ -353,31 +355,32 @@
             const krName = koreanNames[highestSuccessIndex] || prediction[highestSuccessIndex].className;
             labelContainer.innerText = krName;
 
-            // 결과 이미지 경로를 ./1.png 형태로 출력하도록 수정
             const imgNumber = highestSuccessIndex + 1;
             if (imgNumber <= 8) {
                 const imgContainer = document.getElementById("result-image-container");
                 imgContainer.innerHTML = `<img src="./${imgNumber}.png" alt="${krName}">`;
             }
 
+            // --- [수정] 결과가 확정 났을 때 출력되는 아쉬움/결과 관련 대사 리스트 ---
             let sbResultQuotes = [
-                `와아! ${krName}님! 우리 집게리아에서 같이 알바 안 할래?`,
-                `하하하! ${krName}님, 나랑은 전혀 안 닮았지만 정말 멋져!`,
-                `대박! 비키니 시티의 새로운 스타 ${krName}님이다!`
+                `와아! ${krName}구나! 나랑 안 닮아서 아주 살짝 아쉽지만 반가워!`,
+                `하하하! ${krName}, 집게리아에서 게살버거 하나 먹고 갈래?`,
+                `대박! 비키니 시티의 새로운 이웃 ${krName} 탄생!`
             ];
             
             let patResultQuotes = [
-                `어? ${krName}? 먹는 거야?`,
-                `나랑 안 닮았다고? 그럼 내가 ${krName} 할래.`,
-                `안녕? 나는 뚱이야. 너는 누구였더라?`
+                `에이, 나랑 안 닮았잖아? 아쉽다... 근데 ${krName}는 맛있는 거야?`,
+                `나랑 안 닮았다고? 그럼 내가 지금부터 ${krName} 할래!`,
+                `안녕? 너가 그 유명한 ${krName}구나!`
             ];
 
             let sqResultQuotes = [
-                `흥, 나처럼 예술적인 면모는 눈 씻고 봐도 없군.`,
-                `나랑 안 닮아서 정말 다행이야. 저 바보들이랑 노는 건 질색이라고.`,
-                `${krName}? 또 이상한 이웃이 늘었어... 조용히 좀 살아.`
+                `흥, 나처럼 고결하고 예술적인 면모는 역시 없군. 안 닮아서 다행이야.`,
+                `나랑 안 닮아서 정말 다행이군. 저 녀석들과 엮이는 건 두 명으로 족해.`,
+                `${krName}...? 또 이상한 이웃이 늘어난 기분인데... 조용히만 해줘.`
             ];
 
+            // 결과 즉시 반영
             sbDial.innerText = sbResultQuotes[Math.floor(Math.random() * sbResultQuotes.length)];
             patDial.innerText = patResultQuotes[Math.floor(Math.random() * patResultQuotes.length)];
             sqDial.innerText = sqResultQuotes[Math.floor(Math.random() * sqResultQuotes.length)];
