@@ -236,7 +236,6 @@
         const patDial = document.getElementById('pat-dialogue');
         const sqDial = document.getElementById('sq-dialogue');
 
-        // --- [수정] 평소(비교 전) 대사 목록 (기대하는 대사 추가) ---
         const sbIdleQuotes = ["월요일 좋아!", "난 준비됐어!", "집게리아로 오세요!", "따라라라라라~🎶", "나랑 닮은 이웃이 나오면 좋겠다!"];
         const patIdleQuotes = ["으아암...", "아무것도 안 하기가 내 전공이야.", "나랑 닮으면 맛있는 거 주나?", "내 배꼽 어디 갔지?", "단어란 참 어려워.."];
         const sqIdleQuotes = ["언제쯤 조용해질까...", "클라리넷 연습해야 해.", "나랑 안 닮은 정상적인 사람이어야 할 텐데.", "집게사장, 월급 좀 올려줘.", "집에 가고 싶다.."];
@@ -258,12 +257,10 @@
         function startIdleDialogues() {
             stopIdleDialogues();
 
-            // 첫 출력 실행
             changeDialogue(sbDial, sbIdleQuotes);
             changeDialogue(patDial, patIdleQuotes);
             changeDialogue(sqDial, sqIdleQuotes);
 
-            // 평소 주기 루프 돌리기
             dialogueIntervals.push(setInterval(() => changeDialogue(sbDial, sbIdleQuotes), 2500));
             dialogueIntervals.push(setInterval(() => changeDialogue(patDial, patIdleQuotes), 2500));
             dialogueIntervals.push(setInterval(() => changeDialogue(sqDial, sqIdleQuotes), 2500));
@@ -305,18 +302,16 @@
             if (isRunning) {
                 cancelAnimationFrame(animationId);
                 isRunning = false;
-                stopIdleDialogues(); // 사진을 찍으면 평소 대사 루프를 잠깐 멈춤
+                stopIdleDialogues(); 
                 await predict();
                 btn.innerText = "다시 찍기";
             } else {
-                // --- [수정] 다시 찍기를 누르면 평소 상태로 돌아가도록 세팅 ---
                 animationId = window.requestAnimationFrame(loop);
                 isRunning = true;
                 btn.innerText = "찰칵! 멈추기";
                 document.getElementById("label-container").innerText = "분석 중...";
                 document.getElementById("result-image-container").innerHTML = '<span style="color: #666; font-size: 0.9rem;">사진을 찍어주세요</span>';
                 
-                // 다시 평소 대사 상태로 롤백 및 루프 재시작
                 startIdleDialogues();
             }
         }
@@ -358,10 +353,10 @@
             const imgNumber = highestSuccessIndex + 1;
             if (imgNumber <= 8) {
                 const imgContainer = document.getElementById("result-image-container");
-                imgContainer.innerHTML = `<img src="./${imgNumber}.png" alt="${krName}">`;
+                // 정답 이미지를 ./image/ 폴더 내부에서 가져오도록 경로를 수정했습니다.
+                imgContainer.innerHTML = `<img src="./image/${imgNumber}.png" alt="${krName}">`;
             }
 
-            // --- [수정] 결과가 확정 났을 때 출력되는 아쉬움/결과 관련 대사 리스트 ---
             let sbResultQuotes = [
                 `와아! ${krName}구나! 나랑 안 닮아서 아주 살짝 아쉽지만 반가워!`,
                 `하하하! ${krName}, 집게리아에서 게살버거 하나 먹고 갈래?`,
@@ -380,7 +375,6 @@
                 `${krName}...? 또 이상한 이웃이 늘어난 기분인데... 조용히만 해줘.`
             ];
 
-            // 결과 즉시 반영
             sbDial.innerText = sbResultQuotes[Math.floor(Math.random() * sbResultQuotes.length)];
             patDial.innerText = patResultQuotes[Math.floor(Math.random() * patResultQuotes.length)];
             sqDial.innerText = sqResultQuotes[Math.floor(Math.random() * sqResultQuotes.length)];
